@@ -6,9 +6,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Scanner;
 
-public class TicTacToe implements ActionListener {
+public class TicTacToe implements ActionListener, MouseListener {
     private static final int GRID_SIZE = 3;
     private gameState state;
     private int[][] grid; // 0 = Empty, 1 = X, 2 = O
@@ -48,6 +49,7 @@ public class TicTacToe implements ActionListener {
         frame.getContentPane().setBackground(new Color(50, 50, 50));
         frame.setLayout(new BorderLayout());
         frame.setVisible(true);
+        frame.addMouseListener(this);
 
         // Initialize the Text field
         textField.setBackground(new Color(25, 25 ,25));
@@ -87,7 +89,6 @@ public class TicTacToe implements ActionListener {
     }
 
     public void runManually() {
-
         // Display the title for 2 seconds before starting the game
         try {
             Thread.sleep(2000);
@@ -96,8 +97,8 @@ public class TicTacToe implements ActionListener {
         }
 
         while(state == gameState.RUNNING) {
-//            // Draw Grid - Intended for testing
-//            printGrid();
+            // Draw Grid - Intended for testing
+            printGrid();
 
             // set the title field
             textField.setText(isPlayerOne ? "X Turn" : "O Turn");
@@ -146,6 +147,12 @@ public class TicTacToe implements ActionListener {
         this.isPlayerOne = !this.isPlayerOne;
     }
 
+    public void markButtonGreen(int x, int y) {
+        buttons[x][y].setBackground(new Color(15, 150, 0));
+        buttons[x][y].setForeground(Color.black);
+        buttons[x][y].setContentAreaFilled(true);
+    }
+
     public gameState checkForEndGame() {
         // TODO check for endGame possibilities
 
@@ -154,30 +161,56 @@ public class TicTacToe implements ActionListener {
 
             // There are three identical symbols on the line
             if (grid[i][0] == grid[i][1] && grid[i][1] == grid[i][2]) {
-                // Check who won
-                if (grid[i][0] == 1) // X = 1    |     O = 2
-                    return gameState.WIN_X;
-                else if (grid[i][0] == 2)
-                    return gameState.WIN_O;
+                // Color the winner squares
+                if(grid[i][0] != 0) {
+                    markButtonGreen(i,0);
+                    markButtonGreen(i,1);
+                    markButtonGreen(i,2);
+                    if (grid[i][0] == 1) // X = 1    |     O = 2
+                        return gameState.WIN_X;
+                    else if (grid[i][0] == 2)
+                        return gameState.WIN_O;
+                }
             }
 
             // There are three identical symbols on the column
             if (grid[0][i] == grid[1][i] && grid[1][i] == grid[2][i]) {
-                // Check who won
-                if (grid[0][i] == 1) // X = 1    |     O = 2
-                    return gameState.WIN_X;
-                else if (grid[0][i] == 2)
-                    return gameState.WIN_O;
+                if(grid[0][i] != 0) {
+                    markButtonGreen(0,i);
+                    markButtonGreen(1,i);
+                    markButtonGreen(2,i);
+                    // Check who won
+                    if (grid[0][i] == 1) // X = 1    |     O = 2
+                        return gameState.WIN_X;
+                    else if (grid[0][i] == 2)
+                        return gameState.WIN_O;
+                }
             }
         }
 
         // Check diagonals
-        if((grid[0][0] == grid[1][1] && grid[1][1] == grid[2][2])
-        || (grid[2][0] == grid[1][1] && grid[1][1] == grid[0][2])) {
-            if(grid[1][1] == 1) {
-                return gameState.WIN_X;
-            } else if (grid[1][1] == 2)
-                return gameState.WIN_O;
+        if(grid[2][0] == grid[1][1] && grid[1][1] == grid[0][2]) {
+            if(grid[1][1] != 0) {
+                markButtonGreen(2,0);
+                markButtonGreen(1,1);
+                markButtonGreen(0,2);
+                if(grid[1][1] == 1) {
+                    return gameState.WIN_X;
+                } else if (grid[1][1] == 2)
+                    return gameState.WIN_O;
+            }
+        }
+
+        if(grid[0][0] == grid[1][1] && grid[1][1] == grid[2][2]) {
+            if(grid[0][0] != 0) {
+                markButtonGreen(0,0);
+                markButtonGreen(1,1);
+                markButtonGreen(2,2);
+                if(grid[1][1] == 1) {
+                    return gameState.WIN_X;
+                } else if (grid[1][1] == 2)
+                    return gameState.WIN_O;
+            }
         }
 
         // Check for free spaces
@@ -205,5 +238,51 @@ public class TicTacToe implements ActionListener {
                 }
             }
         }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if(e.getButton() == MouseEvent.BUTTON1){
+//            reset();
+        }
+    }
+
+//    private void reset() {
+//
+//        // Reset Grid
+//        grid = null;
+//        grid = new int[3][3];
+//
+//        // Reset Game State
+//        state = gameState.RUNNING;
+//
+//        // Reset Buttons
+//        for(int i = 0; i < 3; i++) {
+//            for(int j = 0; j < 3; j++) {
+//                buttons[i][j].setText("");
+//                buttons[i][j].setForeground(new Color(250,0,0));
+//                buttons[i][j].setContentAreaFilled(false);
+//            }
+//        }
+//    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
 }
