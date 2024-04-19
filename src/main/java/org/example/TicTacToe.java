@@ -1,16 +1,14 @@
 package org.example;
 
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Scanner;
 
-public class TicTacToe {
+public class TicTacToe implements ActionListener {
     private static final int GRID_SIZE = 3;
-    private enum gameState {
-        RUNNING,
-        WIN_X,
-        WIN_O,
-        DRAW
-    }
 
     private gameState state;
     private int[][] grid; // 0 = Empty, 1 = X, 2 = O
@@ -19,10 +17,65 @@ public class TicTacToe {
 
     private Scanner sc;
 
+//    private MyFrame gameFrame;
+//
+//    private DrawingCanvas canvas;
+
+    JFrame frame = new JFrame();
+    JPanel title_panel = new JPanel();
+    JPanel button_panel = new JPanel();
+    JLabel textField = new JLabel();
+
+    JButton[][] buttons = new JButton[3][3];
+
 
 
     // Constructor
     public TicTacToe() {
+
+        // Initialize the frame
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800,800);
+        frame.getContentPane().setBackground(new Color(50, 50, 50));
+        frame.setLayout(new BorderLayout());
+        frame.setVisible(true);
+
+        // Initialize the Text field
+        textField.setBackground(new Color(25, 25 ,25));
+        textField.setForeground(new Color(25, 255 ,0));
+        textField.setFont(new Font("Ink Free", Font.BOLD, 75));
+        textField.setHorizontalAlignment(JLabel.CENTER);
+        textField.setText("Tic-Tac-Toe");
+        textField.setOpaque(true);
+
+        // Initialize the title panel
+        title_panel.setLayout(new BorderLayout());
+        title_panel.setBounds(0,0, 800, 100);
+
+        // Add the text field to the title panel
+        title_panel.add(textField);
+
+        button_panel.setLayout(new GridLayout(3,3));
+        button_panel.setBackground(new Color(150, 150 ,150));
+
+
+        // Add the title panel to the frame
+        frame.add(title_panel, BorderLayout.NORTH);
+        frame.add(button_panel);
+
+        // Add the buttons to the buttons panel
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+                buttons[i][j] = new JButton();
+                button_panel.add(buttons[i][j]);
+                buttons[i][j].setFont(new Font("MV Boli", Font.BOLD, 120));
+                buttons[i][j].setFocusable(false);
+                buttons[i][j].addActionListener(this);
+            }
+        }
+
+
+
         // Initialize the grid with 0
         grid = new int[GRID_SIZE][GRID_SIZE];
 
@@ -33,21 +86,29 @@ public class TicTacToe {
     }
 
     public void runManually() {
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         while(state == gameState.RUNNING) {
             // Draw Grid
             printGrid();
 
-            // Request coordinates from user
-            System.out.println("Select coord x : ");
-            int x = sc.nextInt();
-            System.out.println("Select coord y : ");
-            int y = sc.nextInt();
+            // set the title field
+            textField.setText(isPlayerOne ? "X Turn" : "O Turn");
 
-            // Place the X/O on the grid
-            placeMarker(x,y);
+//            // Request coordinates from user
+//            System.out.println("Select coord x : ");
+//            int x = sc.nextInt();
+//            System.out.println("Select coord y : ");
+//            int y = sc.nextInt();
 
-            // Switch to the other player
-            switchPlayers();
+//            // Place the X/O on the grid
+//            placeMarker(x,y);
+
 
             // check for endgame
             state = checkForEndGame();
@@ -55,6 +116,7 @@ public class TicTacToe {
 
         printGrid();
         System.out.println(state.toString());
+        textField.setText(state.toString());
     }
 
     public void printGrid() {
@@ -65,13 +127,16 @@ public class TicTacToe {
             }
             System.out.println();
         }
+        System.out.println();
     }
 
     public void placeMarker(int x, int y) {
         if(isPlayerOne) {
             placeX(x,y);
+            buttons[x][y].setText("X");
         } else {
             placeO(x,y);
+            buttons[x][y].setText("O");
         }
     }
 
@@ -131,5 +196,22 @@ public class TicTacToe {
         }
 
         return gameState.DRAW;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+
+                // Listen for button presses
+                if(e.getSource() == buttons[i][j]) {
+                    // Place the marker on the grid
+                    placeMarker(i,j);
+
+                    // Switch to the other player
+                    switchPlayers();
+                }
+            }
+        }
     }
 }
